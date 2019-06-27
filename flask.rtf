@@ -1,0 +1,137 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf500
+{\fonttbl\f0\fnil\fcharset0 Calibri;\f1\fnil\fcharset0 Calibri-Italic;}
+{\colortbl;\red255\green255\blue255;\red255\green0\blue0;\red33\green33\blue33;\red0\green176\blue80;
+}
+{\*\expandedcolortbl;;\csgenericrgb\c100000\c0\c0;\csgenericrgb\c12941\c12941\c12941;\csgenericrgb\c0\c69020\c31373;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab708
+\pard\tx916\tx1832\tx2748\tx3664\tx4580\tx5496\tx6412\tx7328\tx8244\tx9160\tx10076\tx10992\tx11908\tx12824\tx13740\tx14656\pardeftab708\ri-46\sa240\partightenfactor0
+
+\f0\fs22 \cf2 @api.route("/books/")\uc0\u8232 class BooksList(Resource):\u8232     def get(self):\u8232         
+\f1\i """\uc0\u8232         returns a list of books\u8232         """\u8232 \u8232         
+\f0\i0 cursor = mydb.books.find(\{\}, \{"_id": 0\})\uc0\u8232         data = []\u8232         for book in cursor:\u8232             data.append(book)\u8232 \u8232         return \{"response": data\}\u8232 \u8232     def post(self):\u8232         
+\f1\i """\uc0\u8232         Add a new book to the list\u8232         """\u8232 \u8232         
+\f0\i0 data = request.get_json()\uc0\u8232         if not data:\u8232             data = \{"response": "ERROR"\}\u8232             return data, 404\u8232         else:\u8232             title = data.get('title')\u8232             if title:\u8232                 if mydb.books.find_one(\{"title": title\}):\u8232                     return \{"response": "book already exists."\}, 403\u8232                 else:\u8232                     mydb.insert(data)\u8232 \u8232 \u8232 @api.route("/books/<string:title>")\u8232 class Book(Resource):\u8232 \u8232     def put(self, title):\u8232         
+\f1\i """\uc0\u8232         Edits a selected book\u8232         """\u8232 \u8232         
+\f0\i0 data = request.get_json()\uc0\u8232 \u8232         mydb.books.update(\{'title': title\}, \{'set': data\})\u8232 \u8232     def delete(self, title):\u8232         
+\f1\i """\uc0\u8232     delete a selected book\u8232     """\u8232 \u8232         
+\f0\i0 mydb.books.delete(\{'title': title\})\
+\
+\pard\pardeftab708\ri-46\qj\partightenfactor0
+\cf3 \
+\
+\pard\tx916\tx1832\tx2748\tx3664\tx4580\tx5496\tx6412\tx7328\tx8244\tx9160\tx10076\tx10992\tx11908\tx12824\tx13740\tx14656\pardeftab708\ri-46\sa240\partightenfactor0
+\cf2 app = Flask(__name__)\uc0\u8232 api = Api(app=app)\
+\uc0\u8232 ns_books = api.namespace('books', description = "Books operations")\u8232 ns_movies = api.namespace('movies', description = "Movies operations")\u8232 \u8232 @ns_books.route("/")\u8232 class BooksList(Resource):\u8232     def get(self):\u8232         
+\f1\i """\uc0\u8232         returns a list of books\u8232         """
+\f0\i0 \uc0\u8232 \u8232     def post(self):\u8232         
+\f1\i """\uc0\u8232         Add a new book to the list\u8232         """
+\f0\i0 \uc0\u8232 \u8232 @ns_books.route("/<string:title>")\u8232 class Book(Resource):\u8232 \u8232     def put(self, title):\u8232         
+\f1\i """\uc0\u8232         Edits a selected book\u8232         """\u8232 
+\f0\i0 \uc0\u8232 \u8232     def delete(self, title):\u8232         
+\f1\i """\uc0\u8232     delete a selected book\u8232     """
+\f0\i0 \uc0\u8232 \u8232 @ns_movies.route("/")\u8232 class MoviesList(Resource):\u8232     def get(self):\u8232         
+\f1\i """\uc0\u8232         returns a list of movies\u8232         """
+\f0\i0 \uc0\u8232 \u8232     def post(self):\u8232         
+\f1\i """\uc0\u8232         Add a new movie to the list\u8232         """
+\f0\i0 \uc0\u8232 \u8232 @ns_movies.route("/<string:title>")\u8232 class Movie(Resource):\u8232 \u8232     def put(self, title):\u8232         
+\f1\i """\uc0\u8232         Edits a selected movie\u8232         """\u8232 
+\f0\i0 \uc0\u8232     def delete(self, title):\u8232         
+\f1\i """\uc0\u8232     delete a selected movie\u8232     """
+\f0\i0 \cf3 \
+\pard\tx916\tx1832\tx2748\tx3664\tx4580\tx5496\tx6412\tx7328\tx8244\tx9160\tx10076\tx10992\tx11908\tx12824\tx13740\tx14656\pardeftab708\ri-46\qj\partightenfactor0
+\cf3 \
+\pard\tx916\tx1832\tx2748\tx3664\tx4580\tx5496\tx6412\tx7328\tx8244\tx9160\tx10076\tx10992\tx11908\tx12824\tx13740\tx14656\pardeftab708\ri-46\qj\partightenfactor0
+\cf2 @ns_books.route("/")\
+class BooksList(Resource):\
+    @api.response(200, 'Flask RESTPlus tuto : Success')\
+    @api.response(400, 'Flask RESTPlus tuto: Validation error')\
+    def get(self):\
+        """\
+        returns a list of books\
+        """\
+\
+        cursor = mydb.books.find(\{\}, \{"_id": 0\})\
+        data = []\
+        for book in cursor:\
+            data.append(book)\
+\
+        return \{"response": data\}, 200\
+\pard\pardeftab708\ri-46\partightenfactor0
+\cf3 \
+\
+\pard\pardeftab708\ri-46\partightenfactor0
+\cf0 \
+\pard\pardeftab708\ri-46\partightenfactor0
+\cf2 books_arguments = reqparse.RequestParser()\uc0\u8232 books_arguments.add_argument('author', type=str, required=True)\u8232 books_arguments.add_argument('language', type=str, choices=['en', 'fr'])\u8232 \u8232 \u8232 @ns_books.route("/")\u8232 class BooksList(Resource):\u8232     @api.expect(books_arguments)\u8232     def get(self):\u8232         
+\f1\i """\uc0\u8232         returns a list of books\u8232         """\u8232         
+\f0\i0 data = books_arguments.parse_args(request)\uc0\u8232 \u8232         if data.get('language'):\u8232             cursor = mydb.books.find(\{'author': data.get('author'), 'language': data.get('language')\}, \{"_id": 0\})\u8232         else:\u8232             cursor = mydb.books.find(\{'author': data.get('author')\}, \{"_id": 0\})\u8232         data = []\u8232         for book in cursor:\u8232             data.append(book)\u8232 \u8232         return \{"response": data\}\
+\pard\pardeftab708\ri-46\partightenfactor0
+\cf0 \
+\pard\pardeftab708\ri-46\qj\partightenfactor0
+\cf4 \
+\
+\pard\pardeftab708\ri-46\qj\partightenfactor0
+\cf2 from flask_restplus import fields\
+\
+book_definition = api.model('Book Informations', \{\
+    'author': fields.String(required=True),\
+    'title': fields.String(required=True),\
+    'language': fields.String(required=True)\
+\})\
+\pard\pardeftab708\ri-46\qj\partightenfactor0
+\cf3 \
+\
+\pard\pardeftab708\ri-46\qj\partightenfactor0
+\cf2 \
+@ns_books.route("/")\
+class BooksList(Resource):\
+    @api.expect(books_arguments)\
+    def get(self):\
+        """\
+        returns a list of books\
+        """\
+\
+    @api.expect(book_definition)\
+    def post(self):\
+        """\
+        Add a new book to the list\
+        """\
+        data = request.get_json()\
+        title = data.get('title')\
+        if title:\
+            if mydb.books.find_one(\{"title": title\}):\
+                return \{"response": "book already exists."\}\
+            else:\
+                mydb.books.insert_one(data)\
+\pard\tx916\tx1832\tx2748\tx3664\tx4580\tx5496\tx6412\tx7328\tx8244\tx9160\tx10076\tx10992\tx11908\tx12824\tx13740\tx14656\pardeftab708\ri-46\qj\partightenfactor0
+\cf3 \
+\pard\pardeftab708\ri-46\qj\partightenfactor0
+\cf3 \
+\
+\pard\pardeftab708\ri-46\qj\partightenfactor0
+\cf2 list_books = api.model('Books', \{\
+    'books': fields.List(fields.Nested(book_definition))\
+\})\
+\
+\
+@ns_books.route("/")\
+class BooksList(Resource):\
+    @api.marshal_with(list_books)\
+    def get(self):\
+        """\
+        returns a list of books\
+        """\
+        data = books_arguments.parse_args(request)\
+\
+        if data.get('language'):\
+            cursor=mydb.books.find(\{'author':data.get('author'),'language':data.get('language')\}, \{"_id":0\})\
+        else:\
+            cursor = mydb.books.find(\{'author': data.get('author')\}, \{"_id":0\})\
+        data = []\
+        for book in cursor:\
+            data.append(book)\
+\
+        return \{"books": data\}\
+}
